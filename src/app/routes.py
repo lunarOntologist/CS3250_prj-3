@@ -1,18 +1,14 @@
 from app import app, db
-from app.models import Listing, User, Reservation, Rating
-from app.forms import PostListingForm, SignUpForm, LoginForm, PickupForm
-from datetime import datetime
-from zoneinfo import ZoneInfo
-
-DENVER = ZoneInfo('America/Denver')
-from flask import abort, render_template, redirect, url_for, request, flash
-from flask_login import login_required, login_user, logout_user, current_user
+from app.models import User
+from app.forms import SignUpForm, LoginForm
+from flask import render_template, redirect, url_for
+from flask_login import login_required, login_user, logout_user
 import bcrypt
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect(url_for('login'))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -25,7 +21,11 @@ def register():
             error = 'That email is already registered'
         else:
             hashed_passwd = bcrypt.hashpw(form.passwd.data.encode('utf-8'), bcrypt.gensalt())
-            new_user = User(name=form.name.data, email=form.email.data, passwd=hashed_passwd)
+            new_user = User(
+                username=form.name.data,
+                email=form.email.data,
+                passwd=hashed_passwd
+            )
             db.session.add(new_user)
             db.session.commit()
             return redirect(url_for('login'))

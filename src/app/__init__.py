@@ -2,10 +2,15 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
+import uuid
 
 app = Flask("Event Planner")
-app.secret_key = os.getenv("SECRET_KEY")
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///event_planner.db"
+)
 
 db = SQLAlchemy()
 db.init_app(app)
@@ -22,6 +27,6 @@ from app.models import User
 
 @login_manager.user_loader
 def load_user(id):
-    return db.session.get(User, int(id))
+    return db.session.get(User, uuid.UUID(id))
 
 from app import routes
