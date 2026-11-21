@@ -163,4 +163,4 @@ Describe dependencies between user stories using their IDs (for example, US3 dep
 | US4 | 4 | 2 | 5 | - | US3 | Required |
 | US5 | 5 | 2 | 2 | - | US2-3 | Required |
 | US6 | 6 | 1 | 2 | - | US3-5 | Required |
-| US7 | 7 | 1 | 5 | - | US1 | Optional |
+| US7 | 7 | 1 | 5 | - | US6 | Optional |
