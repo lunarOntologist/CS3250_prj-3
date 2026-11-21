@@ -108,3 +108,59 @@ Total: 100 points
 -5 Little or no evidence of continuous development on the dev branch
 -5 No burndown chart was created
 ```
+
+# User Stories
+
+Describe the **user stories** for the project, which are short, simple descriptions of a feature told from the perspective of the end user. Each **user story** should include clear **acceptance criteria** and a **point estimate**. The **user stories** must align with the **use case diagram** and should be labeled as US#1, US#2, and so on. 
+
+Use the following template when writing your **user stories**. 
+
+```
+As a [type of user], I want to [perform some task] so that I can [achieve some goal].
+
+Acceptance Criteria
+
+Given that [context],
+When [action],
+Then [expected outcome].
+```
+
+US1: As a user, I want to login, so that I can have everything I do be tracked via my account. 
+Given that I have inputted my login info, when I press login, then I should be on the home page.
+
+US2: As a user, I want to create events, so that other people can view them. 
+Given I have filled out all required fields, when I click post, the event should be saved to a database. 
+
+US3: As a user, I want to view all events on the calendar, so I can stay up-to date. 
+Given that I have opened the view events page, I should see all events others have created, as well as my own.
+
+US4: As a user, I want to RSVP to events, to let the owner know what to plan for. 
+Given I have opened the RSVP page under an event, when I fill it out, that information should be saved to the post for the owner to see. 
+
+US5: As an event owner, I want to edit my own events, so I may correct typos or show changes in plans. 
+Given I have opened the editing page, when I fill out the form, the new information should be saved. 
+
+US6: As a user who has RSVPd to an event, I want to suggest changes to the event. Given I open the editing page, when I fill out the form, my suggested changes should be saved for the owner to look at.
+
+US7 (optional): As an event owner, I want to approve or deny suggestions so that the event is automatically updated. 
+Given I have approved a change, when I click confirm, the event should be edited to match the change. 
+
+# Product Backlog
+
+The backlog should have all user stories, including the ones that are optional. Assign a user value to each story using the following scale:
+
+3 = High value
+2 = Medium value
+1 = Low value
+
+Describe dependencies between user stories using their IDs (for example, US3 depends on US1). Fill out the table below. 
+
+| ID | Rank | User value | Story Points | Priority Score | Depends on | Type 
+| --- | --- | --- | --- | --- | --- | --- |
+| US1 | 1 | 3 | - | - | None | Required |
+| US2 | 2 | 3 | - | - | US1 | Required |
+| US3 | 3 | 3 | - | - | US2 | Required |
+| US4 | 4 | 2 | - | - | US3 | Required |
+| US5 | 5 | 2 | - | - | US2-3 | Required |
+| US6 | 6 | 1 | - | - | US3-5 | Required |
+| US7 | 7 | 1 | - | - | US1 | Optional |
