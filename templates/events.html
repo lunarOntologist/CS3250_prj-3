@@ -32,6 +32,7 @@
                     <p><strong>Capacity:</strong> {{ event.capacity }}</p>
                     <p>{{ event.description }}</p>
                     <p><a href="{{ url_for('event_detail', event_id=event.eventId) }}">View Details</a></p>
+                    <p><a href="{{ url_for('rsvp', event_id=event.eventId) }}">RSVP</a></p>
                 </article>
                 <hr>
             {% endfor %}

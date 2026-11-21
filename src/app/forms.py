@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, IntegerField, SubmitField
+from wtforms import StringField, PasswordField, TextAreaField, IntegerField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Email, Length, NumberRange, ValidationError
 from wtforms.fields import DateTimeLocalField
 
@@ -64,3 +64,15 @@ class CreateEventForm(FlaskForm):
     def validate_end_time(self, field):
         if self.start_time.data and field.data and field.data <= self.start_time.data:
             raise ValidationError('End time must be after start time.')
+
+class RSVPForm(FlaskForm):
+    status = SelectField(
+        'RSVP Status',
+        choices=[
+            ('going', 'Going'),
+            ('maybe', 'Maybe'),
+            ('not_going', 'Not Going')
+        ],
+        validators=[DataRequired()]
+    )
+    submit = SubmitField('Submit RSVP')

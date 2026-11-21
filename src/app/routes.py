@@ -1,11 +1,12 @@
 from app import app, db
-from app.models import User, Event
-from app.forms import SignUpForm, LoginForm, CreateEventForm
+from app.models import User, Event, RSVP
+from app.forms import SignUpForm, LoginForm, CreateEventForm, RSVPForm
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_required, login_user, logout_user, current_user
 from datetime import datetime
 import uuid
 import bcrypt
+from sqlalchemy import select
 
 
 @app.route('/')
@@ -94,3 +95,31 @@ def create_event():
         flash('Event created successfully!', 'success')
         return redirect(url_for('events', event_id=new_event.eventId))
     return render_template('create_event.html', form=form)
+
+@app.route('/event/<uuid:event_id>/rsvp', methods=['GET', 'POST'])
+@login_required
+def rsvp(event_id):
+    form = RSVPForm()
+
+    existing_rsvp = db.session.scalar(
+        select(RSVP).where(
+            RSVP.eventId == event_id,
+            RSVP.userId == current_user.userId
+        )
+    )
+    
+    if form.validate_on_submit():
+        if existing_rsvp:
+            existing_rsvp.status = form.status.data
+        else:
+            new_rsvp = RSVP(
+                eventId=event_id,
+                userId=current_user.userId,
+                status=form.status.data
+            )
+            db.session.add(new_rsvp)
+            
+        db.session.commit()
+        return redirect(url_for('events', event_id=event_id))
+        
+    return render_template('rsvp.html', form=form)
