@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h1>{{ event.title }}</h1>
+
+    <p>
+        <a href="{{ url_for('events') }}">
+            <button type="button">Back to Events</button>
+        </a>
+    </p>
+
+    <dl>
+        <dt>Description</dt>
+        <dd>{{ event.description }}</dd>
+
+        <dt>Location</dt>
+        <dd>{{ event.location }}</dd>
+
+        <dt>Start Time</dt>
+        <dd>{{ event.startTime.strftime('%Y-%m-%d %H:%M') }}</dd>
+
+        <dt>End Time</dt>
+        <dd>{{ event.endTime.strftime('%Y-%m-%d %H:%M') }}</dd>
+
+        <dt>Capacity</dt>
+        <dd>{{ event.capacity }}</dd>
+
+        {% if creator %}
+            <dt>Organized By</dt>
+            <dd>{{ creator.username }}</dd>
+        {% endif %}
+    </dl>
+</div>
+{% endblock %}
