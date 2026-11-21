@@ -157,10 +157,10 @@ Describe dependencies between user stories using their IDs (for example, US3 dep
 
 | ID | Rank | User value | Story Points | Priority Score | Depends on | Type 
 | --- | --- | --- | --- | --- | --- | --- |
-| US1 | 1 | 3 | - | - | None | Required |
-| US2 | 2 | 3 | - | - | US1 | Required |
-| US3 | 3 | 3 | - | - | US2 | Required |
-| US4 | 4 | 2 | - | - | US3 | Required |
-| US5 | 5 | 2 | - | - | US2-3 | Required |
-| US6 | 6 | 1 | - | - | US3-5 | Required |
-| US7 | 7 | 1 | - | - | US1 | Optional |
+| US1 | 1 | 3 | 5 | - | None | Required |
+| US2 | 2 | 3 | 3 | - | US1 | Required |
+| US3 | 3 | 3 | 3 | - | US2 | Required |
+| US4 | 4 | 2 | 5 | - | US3 | Required |
+| US5 | 5 | 2 | 2 | - | US2-3 | Required |
+| US6 | 6 | 1 | 2 | - | US3-5 | Required |
+| US7 | 7 | 1 | 5 | - | US1 | Optional |
