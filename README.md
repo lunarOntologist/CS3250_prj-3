@@ -145,6 +145,10 @@ US6: As a user who has RSVPd to an event, I want to suggest changes to the event
 US7 (optional): As an event owner, I want to approve or deny suggestions so that the event is automatically updated. 
 Given I have approved a change, when I click confirm, the event should be edited to match the change. 
 
+US8: (Optional) As an event owner, I want to view all current RSVPs on my own events, but not other people's.
+
+US9: (optional) As An event owner, I want to view all past RSVP statuses in a separate menu than the current statuses.
+
 # Product Backlog
 
 The backlog should have all user stories, including the ones that are optional. Assign a user value to each story using the following scale:
