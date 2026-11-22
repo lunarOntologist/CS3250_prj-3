@@ -1,12 +1,115 @@
-@startuml class
+@startuml EventPlannerClassDiagram
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam shadowing false
+skinparam linetype ortho
 
-class User {
-    email
-    name
-    creation_date
-    role
-    password
-    active
+title Event Planner System - Class Diagram
+left to right direction
+
+' Enumerations
+enum RSVPStatus {
+  GOING
+  MAYBE
+  NOT_GOING
 }
+
+enum EditRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+' Domain Entities
+class User {
+  - userId: UUID
+  - username: String
+  - email: String
+  - passwordHash: String
+  - createdAt: DateTime
+  + register(username: String, email: String, password: String): User
+  + login(email: String, password: String): AuthToken
+  + logout(): void
+}
+
+class Event {
+  - eventId: UUID
+  - creatorId: UUID
+  - title: String
+  - description: String
+  - location: String
+  - startTime: DateTime
+  - endTime: DateTime
+  - capacity: int
+  - createdAt: DateTime
+  - updatedAt: DateTime
+  + getDetails(): EventDetails
+  + updateDetails(title: String, desc: String, location: String, start: DateTime, end: DateTime): void
+  + isCreator(userId: UUID): boolean
+}
+
+class RSVP {
+  - rsvpId: UUID
+  - eventId: UUID
+  - userId: UUID
+  - status: RSVPStatus
+  - respondedAt: DateTime
+  + updateStatus(newStatus: RSVPStatus): void
+}
+
+class EditRequest {
+  - requestId: UUID
+  - eventId: UUID
+  - requesterId: UUID
+  - proposedTitle: String
+  - proposedDescription: String
+  - proposedLocation: String
+  - proposedStartTime: DateTime
+  - proposedEndTime: DateTime
+  - comment: String
+  - status: EditRequestStatus
+  - createdAt: DateTime
+  - reviewedAt: DateTime
+  + approve(): void
+  + reject(): void
+}
+
+' Service / Controller Layer
+class AuthService {
+  + registerUser(username: String, email: String, password: String): User
+  + authenticate(email: String, password: String): AuthToken
+  + validateToken(token: String): User
+}
+
+class EventService {
+  + createEvent(creatorId: UUID, eventData: EventDTO): Event
+  + getAllEvents(): List<Event>
+  + getEventById(eventId: UUID): Event
+  + editEvent(userId: UUID, eventId: UUID, updatedData: EventDTO): Event
+  + submitEditRequest(requesterId: UUID, eventId: UUID, proposedData: EditRequestDTO): EditRequest
+  + reviewEditRequest(creatorId: UUID, requestId: UUID, approve: boolean): EditRequest
+}
+
+class RSVPService {
+  + submitRSVP(userId: UUID, eventId: UUID, status: RSVPStatus): RSVP
+  + getRSVPsForEvent(eventId: UUID): List<RSVP>
+}
+
+' Relationships
+User "1" -- "0..*" Event : creates >
+User "1" -- "0..*" RSVP : submits >
+Event "1" -- "0..*" RSVP : receives >
+User "1" -- "0..*" EditRequest : requests >
+Event "1" -- "0..*" EditRequest : has >
+
+RSVP --> RSVPStatus
+EditRequest --> EditRequestStatus
+
+AuthService ..> User : manages
+EventService ..> Event : manages
+EventService ..> EditRequest : manages
+EventService ..> User : verifies
+RSVPService ..> RSVP : manages
+RSVPService ..> Event : references
 
 @enduml

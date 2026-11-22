@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="container">
+    <h1>Events</h1>
+
+    <nav>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('create_event') }}">Create Event</a>
+            | <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            | <a href="{{ url_for('login') }}">Login</a>
+            | <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </nav>
+
+    {% if events %}
+        <div class="event-list">
+            {% for event in events %}
+                <article class="event-card">
+                    <h2>
+                        <a href="{{ url_for('event_detail', event_id=event.eventId) }}">
+                            {{ event.title }}
+                        </a>
+                    </h2>
+                    <p><strong>Location:</strong> {{ event.location }}</p>
+                    <p>
+                        <strong>When:</strong>
+                        {{ event.startTime.strftime('%Y-%m-%d %H:%M') }} &ndash;
+                        {{ event.endTime.strftime('%Y-%m-%d %H:%M') }}
+                    </p>
+                    <p><strong>Capacity:</strong> {{ event.capacity }}</p>
+                    <p>{{ event.description }}</p>
+                    <p><a href="{{ url_for('event_detail', event_id=event.eventId) }}">View Details</a></p>
+                </article>
+                <hr>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No events available yet.</p>
+        {% if current_user.is_authenticated %}
+            <p><a href="{{ url_for('create_event') }}">Create the first event</a></p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

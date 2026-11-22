@@ -1,0 +1,95 @@
+@startuml EventPlannerSequenceDiagram
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+title Event Planner System - End-to-End Sequence Diagram (US1 - US6)
+
+actor "User A (Creator)" as Creator
+actor "User B (Attendee)" as Attendee
+participant "UI / Client" as UI
+participant "AuthService" as Auth
+participant "EventService" as EventSvc
+participant "RSVPService" as RSVPSvc
+database "Database" as DB
+
+== Sprint 1: US1 - User Registration and Login ==
+Creator -> UI : Enter registration details (username, email, password)
+UI -> Auth : registerUser(username, email, password)
+Auth -> DB : saveUser(userRecord)
+DB --> Auth : User created
+Auth --> UI : Registration success
+
+Creator -> UI : Submit login credentials (email, password)
+UI -> Auth : authenticate(email, password)
+Auth -> DB : findUserByEmail(email)
+DB --> Auth : User record
+Auth --> UI : AuthToken (JWT)
+
+== Sprint 1: US2 - Create Events ==
+Creator -> UI : Fill event form & click "Create Event"
+UI -> EventSvc : createEvent(authToken, eventDTO)
+EventSvc -> Auth : validateToken(authToken)
+Auth --> EventSvc : User A (creatorId)
+EventSvc -> DB : insertEvent(newEvent)
+DB --> EventSvc : Event saved (eventId)
+EventSvc --> UI : 201 Created (Event details)
+
+== Sprint 1: US3 - View Events ==
+Attendee -> UI : Open Event Discovery page
+UI -> EventSvc : getAllEvents()
+EventSvc -> DB : queryEvents()
+DB --> EventSvc : List<Event>
+EventSvc --> UI : Display available events
+
+Attendee -> UI : Select specific event
+UI -> EventSvc : getEventById(eventId)
+EventSvc -> DB : queryEventDetails(eventId)
+DB --> EventSvc : Event details
+EventSvc --> UI : Show event details
+
+== Sprint 2: US4 - RSVP to Events ==
+Attendee -> UI : Select RSVP status ("GOING")
+UI -> RSVPSvc : submitRSVP(attendeeToken, eventId, GOING)
+RSVPSvc -> Auth : validateToken(attendeeToken)
+Auth --> RSVPSvc : User B (userId)
+RSVPSvc -> DB : upsertRSVP(eventId, userId, GOING)
+DB --> RSVPSvc : RSVP saved
+RSVPSvc --> UI : RSVP Confirmation
+
+== Sprint 2: US5 - Edit Events (by Creator) ==
+Creator -> UI : Update event time/location & save
+UI -> EventSvc : editEvent(creatorToken, eventId, updatedDTO)
+EventSvc -> Auth : validateToken(creatorToken)
+Auth --> EventSvc : User A (creatorId)
+EventSvc -> DB : getEventById(eventId)
+DB --> EventSvc : Event (creatorId == User A)
+alt User is Event Creator
+    EventSvc -> DB : updateEvent(eventId, updatedDTO)
+    DB --> EventSvc : Updated Event
+    EventSvc --> UI : 200 OK (Event updated)
+else User is NOT Creator
+    EventSvc --> UI : 403 Forbidden
+end
+
+== Sprint 2: US6 - Request Event Edits (by Non-Creator) ==
+Attendee -> UI : Click "Suggest Edit" & submit proposed changes
+UI -> EventSvc : submitEditRequest(attendeeToken, eventId, proposedDTO)
+EventSvc -> Auth : validateToken(attendeeToken)
+Auth --> EventSvc : User B (requesterId)
+EventSvc -> DB : insertEditRequest(eventId, requesterId, proposedDTO, PENDING)
+DB --> EventSvc : EditRequest created (requestId)
+EventSvc --> UI : Edit request submitted
+
+opt Creator Reviews & Approves Edit Request
+    Creator -> UI : View pending edit requests & click "Approve"
+    UI -> EventSvc : reviewEditRequest(creatorToken, requestId, approve=true)
+    EventSvc -> Auth : validateToken(creatorToken)
+    Auth --> EventSvc : User A (creatorId)
+    EventSvc -> DB : updateEditRequestStatus(requestId, APPROVED)
+    EventSvc -> DB : applyProposedChangesToEvent(eventId, proposedDTO)
+    DB --> EventSvc : Event & Request updated
+    EventSvc --> UI : Edit request approved & event updated
+end
+
+@enduml
