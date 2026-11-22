@@ -1,7 +1,7 @@
 from app import app, db
 from app.models import User, Event, RSVP
 from app.forms import SignUpForm, LoginForm, CreateEventForm, RSVPForm
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, abort
 from flask_login import login_required, login_user, logout_user, current_user
 from datetime import datetime
 import uuid
@@ -79,13 +79,13 @@ def event_detail(event_id):
 def create_event():
     form = CreateEventForm()
     if form.validate_on_submit():
-        new_event = Event(
-            creatorId=current_user.userId,
-            title=form.title.data.strip(),
-            description=form.description.data.strip(),
+        new_event = Event(ta.strip(),
             location=form.location.data.strip(),
             startTime=form.start_time.data,
             endTime=form.end_time.data,
+            creatorId=current_user.userId,
+            title=form.title.data.strip(),
+            description=form.description.data,
             capacity=form.capacity.data,
             createdAt=datetime.utcnow(),
             updatedAt=datetime.utcnow()
@@ -106,17 +106,38 @@ def rsvp(event_id):
             RSVP.eventId == event_id,
             RSVP.userId == current_user.userId
         )
-    )
     
+    )
+    event = db.session.get(Event, event_id)
+    if not event:
+        abort(404)
+
     if form.validate_on_submit():
         if existing_rsvp:
+            old_status = existing_rsvp.status
+            if old_status == "not_going":
+                if event.capacity == 0:
+                    flash("Event is at maximum capacity.")
+                    return redirect(url_for('event_details', event_id=event_id))
+                elif form.status.data == "going" or "maybe":
+                    event.capacity -= 1
+                
             existing_rsvp.status = form.status.data
+
+            if old_status == "going" or "maybe":
+                if form.status.data == "not_going":
+                    event.capacity += 1     
         else:
+            if event.capacity == 0:
+                flash("Event is at maximum capacity.")
+                return redirect(url_for('event_details', event_id=event_id))
             new_rsvp = RSVP(
                 eventId=event_id,
                 userId=current_user.userId,
                 status=form.status.data
             )
+            if new_rsvp.status == "going" or "maybe":
+                event.capacity -= 1
             db.session.add(new_rsvp)
             
         db.session.commit()
